@@ -1,5 +1,5 @@
 import numpy as np
-stop_criterea = 10**-5
+stop_criteria = 10**-5
 
 def descent(gradient, learn_rate, start_point): #gradient- function that calculates gradient, num_epochs- number of optimization epochs
     #learn rate is a function recieving x and d and returning learning rate

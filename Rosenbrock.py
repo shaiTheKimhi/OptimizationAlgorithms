@@ -18,6 +18,13 @@ def gradient(Q):
     return gf
 
 
+def hessian(Q):
+    def gf(x):
+        return 0.5 * (Q @ x + Q.T @ x)
+
+    return gf
+
+
 def exact_line_search(Q):
     def els(x, d):  # d- conjugate gradient direction x-current parameters
         Qd = Q @ d
