@@ -6,13 +6,12 @@ from mcholmz import *
 
 # def newton_method(f,x,search_type,step_size):
 def newton_method(gradient, hessian, learn_rate, start_point):
-    x = start_point
+    x = np.array(start_point)
     stop_criteria = 10 ** -5
     i = 0
 
     # if search_type=='exact':
     g = -gradient(x)
-    # Q1 = np.array([[10, 0], [0, 1]])
 
     while np.linalg.norm(g) > stop_criteria:
         i += 1
@@ -27,8 +26,9 @@ def newton_method(gradient, hessian, learn_rate, start_point):
         z = (y/D)
         dk = np.linalg.solve(L.T, z)  # backward_substitution(L,g)
         # dk2 = np.linalg.inv(hessian(x)) @ g
-        # a = line_search(qd.func(Q1), gradient, x, g)
-        x += dk * learn_rate(x, g)
+        # Q1 = np.array([[10, 0], [0, 1]])
+        # a = line_search(qd.func(Q1), gradient, x, dk)
+        x += dk * learn_rate(x, dk)
         g = -gradient(x)
 
     return [i] + list(x)  # returns optimal x

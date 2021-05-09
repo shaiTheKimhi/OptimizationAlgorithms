@@ -12,7 +12,7 @@ def func(Q):
 # Gf(x) = 1/2(Qx+Q'x)
 def gradient(Q):
     def gf(x):
-        return 0.5*(Q @ x+Q.T @ x) 
+        return 0.5*((Q @ x)+(Q.T @ x))
     return gf
 
 
