@@ -11,6 +11,9 @@ gradQ1d = qd.gradient(Q1)
 hessianQ1d = qd.hessian(Q1)
 exact_line_searchQ1 = qd.exact_line_search(Q1)
 
+#print(dc.descent(gradQ1d, dc.inexact_line_search, np.array([-.2, -2]), qd.func(Q1)))
+
+
 # x0 = newton(qd.func(Q2),  np.array([-.2, -2]), fprime=None, args=(), tol=10 ** -5, maxiter=55000, fprime2=None)
 # print("x0:", x0)
 print("case_1_GD:", dc.descent(gradQ1d, exact_line_searchQ1, np.array([-.2, -2])))
@@ -25,6 +28,8 @@ hessianQ2d = qd.hessian(Q2)
 exact_line_searchQ2 = qd.exact_line_search(Q2)
 print("case_2_GD:", dc.descent(gradQ2d, exact_line_searchQ2, np.array([-.2, -2])))
 print("case_2_NM:", nm.newton_method(gradQ2d, hessianQ2d, exact_line_searchQ2, np.array([-.2, -2])))
+
+
 
 
 
