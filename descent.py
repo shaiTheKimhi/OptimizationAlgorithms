@@ -18,16 +18,16 @@ def inexact_line_search(x, d, func):
     b = 0.5
     a0 = 1
     f0 = func(x)
-    return armijo(x, d, s, b, a0, func, f0)
+    return armijo(x, d, s, 1, a0, func, f0, b)
 
 
-def armijo(x, d, s, b, a, f, f0):
+def armijo(x, d, s, b, a, f, f0, cb):
     bound = d.T@(-d)*a*b
     fi = (f(x + a*b*d) - f0)
     # print(f'{bound}, {fi}, {s*bound} : {x + a*b*d}')
     if (s*bound >= fi and bound <= fi):
         return a*b
-    return armijo(x, d, s, b*0.5, a, f, f0)
+    return armijo(x, d, s, b*cb, a, f, f0, cb)
 
 
 # gradient- function that calculates gradient, num_epochs- number of optimization epochs
