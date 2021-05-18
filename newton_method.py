@@ -12,6 +12,8 @@ def newton_method(func, gradient, hessian, start_point, learn_rate, exact_ls=Tru
 
     # if search_type=='exact':
     g = -gradient(x)
+    # Trace of Descent
+    tod = np.array([start_point])
 
     while np.linalg.norm(g) > stop_criteria:
         i += 1
@@ -33,6 +35,7 @@ def newton_method(func, gradient, hessian, start_point, learn_rate, exact_ls=Tru
         else:
             a = learn_rate(x, dk, func)
         x += dk * a
+        tod = np.append(tod, [x], axis=0)
         g = -gradient(x)
 
-    return [i] + list(x)  # returns optimal x
+    return i, tod  # returns optimal x

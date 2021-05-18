@@ -35,7 +35,8 @@ def descent(func, gradient, start_point, learn_rate, exact_ls):
     # learn rate is a function receiving x and d and returning learning rate
     x = np.array(start_point)
     i = 0
-
+    # Trace of Descent
+    tod = np.array([start_point])
     g = -gradient(x)
     while np.linalg.norm(g) > stop_criteria:
         i += 1  # i- number of epochs to convergence
@@ -46,5 +47,6 @@ def descent(func, gradient, start_point, learn_rate, exact_ls):
             a = learn_rate(x, g, func)
         x += g * a
         g = -gradient(x)
+        tod = np.append(tod, [x], axis=0)
 
-    return [i] + list(x)  # returns optimal x
+    return i, tod  # returns optimal x
