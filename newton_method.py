@@ -5,7 +5,7 @@ from mcholmz import *
 
 
 # def newton_method(f,x,search_type,step_size):
-def newton_method(gradient, hessian, learn_rate, start_point):
+def newton_method(func, gradient, hessian, start_point, learn_rate, exact_ls=True):
     x = np.array(start_point)
     stop_criteria = 10 ** -5
     i = 0
@@ -28,7 +28,11 @@ def newton_method(gradient, hessian, learn_rate, start_point):
         # dk2 = np.linalg.inv(hessian(x)) @ g
         # Q1 = np.array([[10, 0], [0, 1]])
         # a = line_search(qd.func(Q1), gradient, x, dk)
-        x += dk * learn_rate(x, dk)
+        if exact_ls is True:
+            a = learn_rate(x, dk)
+        else:
+            a = learn_rate(x, dk, func)
+        x += dk * a
         g = -gradient(x)
 
     return [i] + list(x)  # returns optimal x

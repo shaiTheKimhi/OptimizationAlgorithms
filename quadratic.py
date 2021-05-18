@@ -23,10 +23,3 @@ def hessian(Q):
     return hf
 
 
-def exact_line_search(Q): 
-    def els(x, d):  # d- conjugate gradient direction x-current parameters
-        Qd = Q @ d
-        # returns learning rate which yields optimal value
-        # no need regularization due to guarantee ||d|| > 10**-1
-        return -(x.T @ Qd) / ((d.T @ Qd))
-    return els
