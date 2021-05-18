@@ -25,7 +25,7 @@ def armijo(x, d, s, b, a, f, f0, cb):
     bound = d.T@(-d)*a*b
     fi = (f(x + a*b*d) - f0)
     # print(f'{bound}, {fi}, {s*bound} : {x + a*b*d}')
-    if (s*bound >= fi and bound <= fi):
+    if (s*bound >= fi):
         return a*b
     return armijo(x, d, s, b*cb, a, f, f0, cb)
 
