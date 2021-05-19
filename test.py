@@ -120,6 +120,8 @@ desc = nm.newton_method(fQ1, gradQ1d, hessianQ1d, x3, dc.inexact_line_search, ex
 
 graph(x, y, z, desc, "Setting 6 -NM inexact line search")
 
+
+
 #TODO: make plots for rosenbrook function
 exit(0)
 
