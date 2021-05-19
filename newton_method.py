@@ -33,7 +33,7 @@ def newton_method(func, gradient, hessian, start_point, learn_rate, exact_ls=Tru
         if exact_ls is True:
             a = learn_rate(x, dk)
         else:
-            a = learn_rate(x, dk, func)
+            a = learn_rate(x, dk, func, gradient)
         x += dk * a
         tod = np.append(tod, [x], axis=0)
         g = -gradient(x)

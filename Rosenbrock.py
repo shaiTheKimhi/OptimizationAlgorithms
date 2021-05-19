@@ -19,7 +19,7 @@ def gradient():
         n = x.shape[0]
         g = np.zeros(n)
         g[0] = -2 * (1 - x[0]) - 400 * x[0] * (x[1] - (x[0] ** 2))
-        for i in range(1,n-1):
+        for i in range(1, n-1):
             g[i] = -2*(1-x[i]) - 400*x[i]*(x[i+1]-(x[i]**2)) + 200*(x[i]-(x[i-1]**2))
         g[n-1] = 200*(x[n-1]-(x[n-2]**2))
         return g
