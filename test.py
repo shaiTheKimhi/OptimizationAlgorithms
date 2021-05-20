@@ -7,20 +7,21 @@ import matplotlib.pyplot as plt
 from scipy.optimize import newton
 
 def graph(x,y,z, desc, title):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection="3d")
+    fig = plt.figure(figsize=(10.0,5.0))
+    gs = fig.add_gridspec(1, 2)
+    ax = fig.add_subplot(gs[0], projection="3d")
     ax.plot_surface(x, y, z, color='blue', rstride=1, cstride=1, lw=0.5)
     ax.contour(x, y, z, 10, lw=3, cmap="autumn_r", linestyles="solid")
     ax.contour(x, y, z, 10, lw=3, cmap="autumn_r", linestyles="solid", offset=-1)
     ax.plot(desc[0], desc[1], zs=0, zdir='z', marker='o', markersize=5)
-    plt.title(title + " (3D)")
-    plt.show()
+    ax.set_title(title + " (3D)")
+    #plt.show()
 
-    fig = plt.figure()
-    ax = fig.add_subplot()
+
+    ax = fig.add_subplot(gs[1])
     ax.contour(x, y, z)
     ax.plot(desc[0], desc[1], marker='o', markersize=5)
-    plt.title(title + " (2D)")
+    ax.set_title(title + " (2D)")
     plt.show()
 
 
@@ -115,7 +116,7 @@ desc = dc.descent(fQ1, gradQ1d, x3, dc.inexact_line_search, exact_ls=False)[1].T
 
 graph(x, y, z, desc, "Setting 6 -GD inexact line search")
 
-#setting 5-NM
+#setting 6-NM
 desc = nm.newton_method(fQ1, gradQ1d, hessianQ1d, x3, dc.inexact_line_search, exact_ls=False)[1].T
 
 graph(x, y, z, desc, "Setting 6 -NM inexact line search")
