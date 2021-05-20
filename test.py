@@ -123,7 +123,6 @@ graph(x, y, z, desc, "Setting 6 -NM inexact line search")
 
 
 #TODO: make plots for rosenbrook function
-exit(0)
 
 
 # print(dc.descent(gradQ1d, dc.inexact_line_search, np.array([-.2, -2]), qd.func(Q1)))
@@ -131,9 +130,39 @@ exit(0)
 
 # 2.7 Find the Minimum of the Rosenbrock Function
 # f*=0, plot f(x_k)-f* for GD and NM
+#GD:
 x0 = np.zeros(10)
-print("Rosenbrock_GD:", dc.descent(rb.func(), rb.gradient(), x0, dc.inexact_line_search, False))
-print("Rosenbrock_NM:", nm.newton_method(rb.func(), rb.gradient(), rb.hessian(), x0, dc.inexact_line_search, False))
+f = rb.func()
+desc = dc.descent(rb.func(), rb.gradient(), x0, dc.inexact_line_search, False)[1]
+trail = f(desc.T)
+f_opt = trail[-1] #we might preffer using analytical optimal f for rosebrock
+f_opt = f_opt*np.ones(trail.shape[0])
+
+k = np.arange(trail.shape[0])
+
+fig = plt.figure()
+ax = fig.add_subplot()
+ax.plot(k, trail-f_opt)
+plt.yscale("log")
+
+plt.show()
+
+#NM:
+desc = nm.newton_method(rb.func(), rb.gradient(), rb.hessian(), x0, dc.inexact_line_search, False)[1]
+trail = f(desc.T)
+f_opt = trail[-1] #we might preffer using analytical optimal f for rosebrock
+f_opt = f_opt*np.ones(trail.shape[0])
+
+k = np.arange(trail.shape[0])
+
+fig = plt.figure()
+ax = fig.add_subplot()
+ax.plot(k, trail-f_opt)
+plt.yscale("log")
+
+plt.show()
+#print("Rosenbrock_GD:", desc)
+#print("Rosenbrock_NM:", )
 
 
 
