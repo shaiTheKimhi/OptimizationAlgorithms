@@ -27,9 +27,7 @@ def newton_method(func, gradient, hessian, start_point, learn_rate, exact_ls=Tru
         y = np.linalg.solve(L, g)  # forward_substitution(L,g)
         z = (y/D)
         dk = np.linalg.solve(L.T, z)  # backward_substitution(L,g)
-        # dk2 = np.linalg.inv(hessian(x)) @ g
-        # Q1 = np.array([[10, 0], [0, 1]])
-        # a = line_search(qd.func(Q1), gradient, x, dk)
+
         if exact_ls is True:
             a = learn_rate(x, dk)
         else:

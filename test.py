@@ -6,13 +6,14 @@ import Rosenbrock as rb
 import matplotlib.pyplot as plt
 from scipy.optimize import newton
 
-def graph(x,y,z, desc, title):
+
+def graph(x, y, z, desc, title):
     fig = plt.figure(figsize=(10.0,5.0))
     gs = fig.add_gridspec(1, 2)
     ax = fig.add_subplot(gs[0], projection="3d")
     ax.plot_surface(x, y, z, color='blue', rstride=1, cstride=1, lw=0.5)
-    ax.contour(x, y, z, 10, lw=3, cmap="autumn_r", linestyles="solid")
-    ax.contour(x, y, z, 10, lw=3, cmap="autumn_r", linestyles="solid", offset=-1)
+    ax.contour(x, y, z, 10,  cmap="autumn_r", linestyles="solid")
+    ax.contour(x, y, z, 10,  cmap="autumn_r", linestyles="solid", offset=-1)
     ax.plot(desc[0], desc[1], zs=0, zdir='z', marker='o', markersize=5)
     ax.set_title(title + " (3D)")
     #plt.show()
@@ -22,7 +23,7 @@ def graph(x,y,z, desc, title):
     ax.contour(x, y, z)
     ax.plot(desc[0], desc[1], marker='o', markersize=5)
     ax.set_title(title + " (2D)")
-    plt.show()
+    plt.show(block=False)
 
 
 
@@ -122,13 +123,6 @@ desc = nm.newton_method(fQ1, gradQ1d, hessianQ1d, x3, dc.inexact_line_search, ex
 graph(x, y, z, desc, "Setting 6 -NM inexact line search")
 
 
-
-#TODO: make plots for rosenbrook function
-
-
-# print(dc.descent(gradQ1d, dc.inexact_line_search, np.array([-.2, -2]), qd.func(Q1)))
-
-
 # 2.7 Find the Minimum of the Rosenbrock Function
 # f*=0, plot f(x_k)-f* for GD and NM
 #GD:
@@ -136,8 +130,8 @@ x0 = np.zeros(10)
 f = rb.func()
 desc = dc.descent(rb.func(), rb.gradient(), x0, dc.inexact_line_search, False)[1]
 trail = f(desc.T)
-f_opt = trail[-1] #we might preffer using analytical optimal f for rosebrock
-f_opt = f_opt*np.ones(trail.shape[0])
+f_opt = trail[-1]  # we might preffer using analytical optimal f for rosebrock
+f_opt = np.zeros(trail.shape[0])
 
 k = np.arange(trail.shape[0])
 
@@ -146,13 +140,14 @@ ax = fig.add_subplot()
 ax.plot(k, trail-f_opt)
 plt.yscale("log")
 
-plt.show()
+plt.show(block=False)
 
 #NM:
 desc = nm.newton_method(rb.func(), rb.gradient(), rb.hessian(), x0, dc.inexact_line_search, False)[1]
 trail = f(desc.T)
 f_opt = trail[-1] #we might preffer using analytical optimal f for rosebrock
 f_opt = f_opt*np.ones(trail.shape[0])
+f_opt = np.zeros(trail.shape[0])
 
 k = np.arange(trail.shape[0])
 
