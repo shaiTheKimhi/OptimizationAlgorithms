@@ -4,7 +4,6 @@ import newton_method as nm
 import quadratic as qd
 import Rosenbrock as rb
 import matplotlib.pyplot as plt
-from scipy.optimize import newton
 
 def graph(x,y,z, desc, title):
     fig = plt.figure(figsize=(10.0,5.0))
