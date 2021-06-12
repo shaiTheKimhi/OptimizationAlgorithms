@@ -12,15 +12,17 @@ def inexact_line_search(x, dir, func, grad):
 
 
 def wolf(x, d, sigma, b, a0, f, g, f0, cb):
-    c = (g(x) @ d)  # =phi(0)
+    c = (g(x).T @ d)  # =phi(0)
     alpha = a0 * b
-    bound = sigma * alpha * (g(x) @ d) + f0
+    bound = (sigma * alpha * c) + f0
     # bound = (g(x) @ d)*a*b
-    phi = f(x + alpha * d)
-    g2 = d @ g(x + alpha * d)
+    x_ad = x + alpha * d
+    phi = f(x_ad)
+    g2 = g(x_ad).T @ d
     g1 = 0.9 * c
 
-    if bound >= phi and g(x + alpha * d) @ d >= 0.9 * c:  # 0.9 is c2 this is wolfe curvature condition
+    if bound >= phi and g2 >= g1:  # 0.9 is c2 this is wolfe curvature condition
+        # if bound >= phi and g(x + alpha * d) @ d >= 0.9 * c:  # 0.9 is c2 this is wolfe curvature condition
         # if s * bound >= phi:
         return alpha
     return wolf(x, d, sigma, b * cb, a0, f, g, f0, cb)
