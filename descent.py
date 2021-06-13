@@ -1,5 +1,4 @@
 import numpy as np
-stop_criteria = 10**-5
 
 
 def exact_line_search(Q):
@@ -19,11 +18,11 @@ def inexact_line_search(x, dir, func, grad):
     a0 = 1
     f0 = func(x)
     # s, phi1 = ls.scalar_search_armijo(func, x, d, f0, alpha0=1)
-    return armijo(x, dir, sigma, 1, a0, func, grad, f0, beta)
+    c = (grad(x).T @ dir)  # =phi(0)
+    return armijo(x, dir, sigma, 1, a0, func, grad, f0, beta, c)
 
 
-def armijo(x, d, sigma, b, a0, f, g, f0, cb):
-    c = (g(x) @ d)  # =phi(0)
+def armijo(x, d, sigma, b, a0, f, g, f0, cb, c):
     alpha = a0*b
     bound = sigma * c * alpha
     # bound = (g(x) @ d)*a*b
@@ -32,11 +31,11 @@ def armijo(x, d, sigma, b, a0, f, g, f0, cb):
     if bound >= phi:
     # if s * bound >= phi:
         return alpha
-    return armijo(x, d, sigma, b * cb, a0, f, g, f0, cb)
+    return armijo(x, d, sigma, b * cb, a0, f, g, f0, cb, c)
 
 
 # gradient- function that calculates gradient, num_epochs- number of optimization epochs
-def descent(func, gradient, start_point, learn_rate, exact_ls):
+def descent(func, gradient, start_point, learn_rate, exact_ls, stop_criteria=10**-5):
     # learn rate is a function receiving x and d and returning learning rate
     x = np.array(start_point)
     i = 0

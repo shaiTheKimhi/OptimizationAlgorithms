@@ -8,11 +8,11 @@ def inexact_line_search(x, dir, func, grad):
     a0 = 1
     f0 = func(x)
     # s, phi1 = ls.scalar_search_armijo(func, x, d, f0, alpha0=1)
-    return wolf(x, dir, sigma, 1, a0, func, grad, f0, beta)
+    c = (grad(x).T @ dir)  # =phi(0)
+    return wolf(x, dir, sigma, 1, a0, func, grad, f0, beta, c)
 
 
-def wolf(x, d, sigma, b, a0, f, g, f0, cb):
-    c = (g(x).T @ d)  # =phi(0)
+def wolf(x, d, sigma, b, a0, f, g, f0, cb, c):
     alpha = a0 * b
     bound = (sigma * alpha * c) + f0
     # bound = (g(x) @ d)*a*b
@@ -25,7 +25,7 @@ def wolf(x, d, sigma, b, a0, f, g, f0, cb):
         # if bound >= phi and g(x + alpha * d) @ d >= 0.9 * c:  # 0.9 is c2 this is wolfe curvature condition
         # if s * bound >= phi:
         return alpha
-    return wolf(x, d, sigma, b * cb, a0, f, g, f0, cb)
+    return wolf(x, d, sigma, b * cb, a0, f, g, f0, cb, c)
 
 
 def update(Bk, pk, qk):

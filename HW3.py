@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import BFGS as bfgs
-
+import descent as dc
 
 def test_func(x):  # 1.3.5
     return x[0, :] * np.exp(-(x[0, :] ** 2 + x[1, :] ** 2))
@@ -188,10 +188,12 @@ for i in range(4):
     grad_fun = nn.eval_grad_of_loss_all(train_x, train_y)
     lf = nn.loss_func(train_x, train_y, 500)
     # test_grad = grad_fun(w0)
-    # test_loss = lf(w0)
+    test_loss = lf(w0)
     # func -  feed forward and calculate loss for a given W where x and y are constants
     # gradient - calculate for a given W where x and y are constants
-    w_trail = bfgs.BFGS(lf, grad_fun, w0[:, np.newaxis], bfgs.inexact_line_search, False, e)[1]
+    # w_trail = bfgs.BFGS(lf, grad_fun, w0[:, np.newaxis], bfgs.inexact_line_search, False, e)[1]
+    w_trail = dc.descent(lf, grad_fun, w0[:, np.newaxis], dc.inexact_line_search, False, e)[1]
+
     w_opt = w_trail[-1, :]
     w_opt_mat = w_vec2mat(w_opt)
 
