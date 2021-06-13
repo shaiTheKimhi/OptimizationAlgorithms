@@ -40,10 +40,6 @@ def update(Bk, pk, qk):
     norm = np.linalg.norm
     return Bk + (1 / miuk) * pk @ pk.T - (1 / tk) * sk @ sk.T + tk * vk @ vk.T  # return Bk+1
 
-    # Secant equation
-    # v = pk -  Bk @ qk
-    # return Bk - (v @ v.T)/(v @ qk) #B(k+1)
-
 
 def BFGS(func, gradient, start_point, learn_rate, exact_ls=True, stop_criteria=10 ** -5):
     zero = 10 ** -10
@@ -58,7 +54,7 @@ def BFGS(func, gradient, start_point, learn_rate, exact_ls=True, stop_criteria=1
     prev_x = x
     prev_g = g
 
-    while np.linalg.norm(-g) > stop_criteria:
+    while np.linalg.norm(g) > stop_criteria:
         i += 1
         # we want to solve Hdk=-g
         # 1. find L and d such that H+e=Ldiag(d)L' and LDL'dk=-g
