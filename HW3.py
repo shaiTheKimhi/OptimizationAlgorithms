@@ -2,7 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import BFGS as bfgs
-import descent as dc
+import Rosenbrock as rb
+
 
 def test_func(x):  # 1.3.5
     return x[0, :] * np.exp(-(x[0, :] ** 2 + x[1, :] ** 2))
@@ -29,13 +30,30 @@ def gen_test(n):  # 1.3.11
     return np.random.rand(2, n) * 4 - 2
 
 
-
-
 # 1.3.12
 def init_weights():
     return [np.row_stack([np.random.rand(2, 4) / np.sqrt(4), np.zeros([4])]),
                     np.row_stack([np.random.rand(4, 3) / np.sqrt(3), np.zeros([3])]),
                     np.row_stack([np.random.rand(3, 1) / np.sqrt(1), np.zeros([1])])]
+
+
+# 1.3.13
+def data_vis(f, x=[], y=[], b=False):
+    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+    X = np.arange(-2, 2, 0.2)
+    Y = np.arange(-2, 2, 0.2)
+    X, Y = np.meshgrid(X, Y)
+    Z = f(np.row_stack([np.reshape(X, -1), np.reshape(Y, -1)]))
+    # Plot the surface.
+    surf = ax.plot_surface(X, Y, np.reshape(Z, (20, 20)), cmap=cm.coolwarm,
+                           linewidth=0, antialiased=False)
+    if b is True:
+        ax.scatter(x[0, :], x[1, :], y)
+
+    ax.set_xlabel('X Label')
+    ax.set_ylabel('Y Label')
+    ax.set_zlabel('Z Label')
+    plt.show()
 
 
 def w_mat2vec(weights):
@@ -158,23 +176,25 @@ class NN:
             return np.sum((self.forward_pass(x)(w_mat) - y) ** 2) / n
         return lf
 
-# 1.3.13
-def data_vis(f, x=[], y=[], b=False):  # incomplete
-    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    X = np.arange(-2, 2, 0.2)
-    Y = np.arange(-2, 2, 0.2)
-    X, Y = np.meshgrid(X, Y)
-    Z = f(np.row_stack([np.reshape(X, -1), np.reshape(Y, -1)]))
-    # Plot the surface.
-    surf = ax.plot_surface(X, Y, np.reshape(Z, (20, 20)), cmap=cm.coolwarm,
-                           linewidth=0, antialiased=False)
-    if b is True:
-        ax.scatter(x[0, :], x[1, :], y)
 
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_zlabel('Z Label')
-    plt.show()
+# 1.2 BFGS:
+x0 = np.zeros(10)
+f = rb.func()
+desc = bfgs.BFGS(rb.func(), rb.gradient(), x0, bfgs.inexact_line_search, False)[1]
+print(desc[-1])
+
+trail = f(desc.T)
+f_opt = trail[-1] #we might preffer using analytical optimal f for rosebrock
+f_opt = f_opt*np.ones(trail.shape[0])
+
+k = np.arange(trail.shape[0])
+
+fig = plt.figure()
+ax = fig.add_subplot()
+ax.plot(k, trail-f_opt)
+plt.yscale("log")
+
+plt.show()
 
 # 1.3.14
 nn = NN()
