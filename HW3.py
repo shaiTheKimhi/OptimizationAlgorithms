@@ -145,17 +145,17 @@ class NN:
             w_mat = w_vec2mat(weights)
             for i in range(n):
                 x_2dim = np.expand_dims(x[:, i], axis=1)
-                single_loss_w = self.eval_grad_of_loss_single(x_2dim, y[i], w_mat)
-                mean_grad += single_loss_w*((self.forward_pass(x_2dim)(w_mat) - y[i]) ** 2)
+                mean_grad += self.eval_grad_of_loss_single(x_2dim, y[i], w_mat)
+                # single_loss_w *((self.forward_pass(x_2dim)(w_mat) - y[i]) ** 2)
                 # mean_grad += single_loss * self.loss_func(np.expand_dims(x[:, i], axis=1), y[i], num_samples)(w_mat)
-            return mean_grad.T/n
+            return np.expand_dims(mean_grad.T/n, axis=1)
 
         return grad_all
 
     def loss_func(self, x, y, n):
         def lf(weights):  # estimated is F(x;W)- the output of the model, truth= y the given labels
             w_mat = w_vec2mat(weights)
-            return np.sum((self.forward_pass(x)(w_mat) - y[i]) ** 2) / n
+            return np.sum((self.forward_pass(x)(w_mat) - y) ** 2) / n
         return lf
 
 # 1.3.13
@@ -191,8 +191,9 @@ for i in range(4):
     test_loss = lf(w0)
     # func -  feed forward and calculate loss for a given W where x and y are constants
     # gradient - calculate for a given W where x and y are constants
-    w_trail = bfgs.BFGS(lf, grad_fun, w0[:, np.newaxis], bfgs.inexact_line_search, False, e)[1]
-    # w_trail = dc.descent(lf, grad_fun, w0[:, np.newaxis], dc.inexact_line_search, False, e)[1]
+    # w_trail = bfgs.BFGS(lf, grad_fun, w0[:, np.newaxis], bfgs.inexact_line_search, False, e)[1]
+    w_trail = dc.descent(lf, grad_fun, w0[:, np.newaxis], dc.inexact_line_search, False, e)[1]
+    print('num of iter: ', w_trail.shape[0])
 
     w_opt = w_trail[-1, :]
     w_opt_mat = w_vec2mat(w_opt)
