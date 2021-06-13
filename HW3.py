@@ -78,16 +78,38 @@ class NN:
             self.layer_output.append(act)
 
             x2_h = np.concatenate([self.layer_output[-1], np.ones([1, num_samples])])
-            layer_in = weights[2].T.dot(x2_h)
+            return weights[2].T.dot(x2_h)
+        return fp
+
+    def forward_pass_const_w(self, weights):
+        def fp(x_s):
+            self.layer_input = []
+            self.layer_output = []
+
+            num_samples = x_s.shape[1]
+
+            x_s_h = np.concatenate([x_s, np.ones([1, num_samples])])
+            layer_in = weights[0].T.dot(x_s_h)
             self.layer_input.append(layer_in)
-            self.layer_output.append(layer_in)
-            return layer_in
+            act = activation(layer_in)
+            self.layer_output.append(act)
+
+            x1_h = np.concatenate([self.layer_output[-1], np.ones([1, num_samples])])
+            layer_in = weights[1].T.dot(x1_h)
+            self.layer_input.append(layer_in)
+
+            act = activation(layer_in)
+            # act = act[:, np.newaxis]
+            self.layer_output.append(act)
+
+            x2_h = np.concatenate([self.layer_output[-1], np.ones([1, num_samples])])
+            return weights[2].T.dot(x2_h)
         return fp
 
     # 1.3.8
     def eval_grad_of_loss_single(self, x, y, weights):
         # 1
-        x = x[:, np.newaxis]
+        # x = x[:, np.newaxis]
         F = self.forward_pass(x)(weights)
         # 2
         lg = loss_grad(F, y)
@@ -101,15 +123,17 @@ class NN:
 
 
         # 4  ## x=prev layer output
-        dldx1 = weights[1] @ np.diag(np.squeeze(activation(self.layer_input[1], True))) @ dldx2
+        act_der_diag_1 = np.diag(np.squeeze(activation(self.layer_input[1], True)))
+        dldx1 = weights[1] @ act_der_diag_1 @ dldx2
         dldx1 = dldx1[0:-1]
 
-        dldw1 = self.layer_output[0] @ dldx2.T @ np.diag(np.squeeze(activation(self.layer_input[1], True)))
-        dldw1 = np.concatenate([dldw1, dldx2.T])
+        dldw1 = self.layer_output[0] @ dldx2.T @ act_der_diag_1
+        dldw1 = np.concatenate([dldw1, (act_der_diag_1 @ dldx2).T])
 
-        # dldx0 = weights[0] @ np.diag(activation(self.layer_output[0], True)) @ dldx1
-        dldw0 = x @ dldx1.T @ np.diag(np.squeeze(activation(self.layer_input[0], True)))
-        dldw0 = np.concatenate([dldw0, dldx1.T])
+        act_der_diag_0 = np.diag(np.squeeze(activation(self.layer_input[0], True)))
+        # dldx0 = weights[0] @act_der_diag_0 @ dldx1
+        dldw0 = x @ dldx1.T @ act_der_diag_0
+        dldw0 = np.concatenate([dldw0, (act_der_diag_0 @ dldx1).T])
         dldw = [dldw0, dldw1, dldw2]
         return w_mat2vec(dldw)
 
@@ -120,10 +144,11 @@ class NN:
             mean_grad = 0
             w_mat = w_vec2mat(weights)
             for i in range(n):
-                single_loss = self.eval_grad_of_loss_single(x[:, i], y[i], w_mat)
-                mean_grad += single_loss*((self.forward_pass(np.expand_dims(x[:, i], axis=1))(w_mat) - y[i]) ** 2)/n
+                x_2dim = np.expand_dims(x[:, i], axis=1)
+                single_loss_w = self.eval_grad_of_loss_single(x_2dim, y[i], w_mat)
+                mean_grad += single_loss_w*((self.forward_pass(x_2dim)(w_mat) - y[i]) ** 2)
                 # mean_grad += single_loss * self.loss_func(np.expand_dims(x[:, i], axis=1), y[i], num_samples)(w_mat)
-            return mean_grad.T
+            return mean_grad.T/n
 
         return grad_all
 
@@ -134,41 +159,46 @@ class NN:
         return lf
 
 # 1.3.13
-def data_vis(x, y, f, z, b):  # incomplete
+def data_vis(f, x=[], y=[], b=False):  # incomplete
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
     X = np.arange(-2, 2, 0.2)
     Y = np.arange(-2, 2, 0.2)
     X, Y = np.meshgrid(X, Y)
-    Z = f(X,Y)
+    Z = f(np.row_stack([np.reshape(X, -1), np.reshape(Y, -1)]))
     # Plot the surface.
-    surf = ax.plot_surface(X, Y, z, cmap=cm.coolwarm,
+    surf = ax.plot_surface(X, Y, np.reshape(Z, (20, 20)), cmap=cm.coolwarm,
                            linewidth=0, antialiased=False)
     if b is True:
-        ax.scatter(x, y, z)
+        ax.scatter(x[0, :], x[1, :], y)
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
-
+    plt.show()
 
 # 1.3.14
 nn = NN()
 train_x, train_y = gen_training(500)
-test_set = gen_test(200)
+test_set_x = gen_test(200)
 
-# for i in range(4):
-i=1
-e = 10 ** -(i + 1)
-print('epsilon: ', e)
-w0 = w_mat2vec(init_weights())
-grad_fun = nn.eval_grad_of_loss_all(train_x, train_y)
-lf = nn.loss_func(train_x, train_y, 500)
-test_grad = grad_fun(w0)
-test_loss = lf(w0)
-# func -  feed forward and calculate loss for a given W where x and y are constants
-# gradient - calculate for a given W where x and y are constants
-w_opt = bfgs.BFGS(lf, grad_fun, w0[:, np.newaxis], bfgs.inexact_line_search, False, e)[1]
-w_opt_mat = w_vec2mat(w_opt)
-z_train = nn.forward_pass(train_x)(w_opt_mat)
-data_vis()
-print('descent: ', desc)
+for i in range(4):
+    e = 10 ** -(i + 1)
+    print('epsilon: ', e)
+    w0 = w_mat2vec(init_weights())
+    grad_fun = nn.eval_grad_of_loss_all(train_x, train_y)
+    lf = nn.loss_func(train_x, train_y, 500)
+    # test_grad = grad_fun(w0)
+    # test_loss = lf(w0)
+    # func -  feed forward and calculate loss for a given W where x and y are constants
+    # gradient - calculate for a given W where x and y are constants
+    w_trail = bfgs.BFGS(lf, grad_fun, w0[:, np.newaxis], bfgs.inexact_line_search, False, e)[1]
+    w_opt = w_trail[-1, :]
+    w_opt_mat = w_vec2mat(w_opt)
+
+    # b1
+    fp_w = nn.forward_pass_const_w(w_opt_mat)
+    data_vis(fp_w)
+    # b2
+    y_test = nn.forward_pass(test_set_x)(w_opt_mat)
+    data_vis(test_func, test_set_x, y_test, b=True)
+    # print('descent: ', desc)
