@@ -191,8 +191,8 @@ for i in range(4):
     test_loss = lf(w0)
     # func -  feed forward and calculate loss for a given W where x and y are constants
     # gradient - calculate for a given W where x and y are constants
-    # w_trail = bfgs.BFGS(lf, grad_fun, w0[:, np.newaxis], bfgs.inexact_line_search, False, e)[1]
-    w_trail = dc.descent(lf, grad_fun, w0[:, np.newaxis], dc.inexact_line_search, False, e)[1]
+    w_trail = bfgs.BFGS(lf, grad_fun, w0[:, np.newaxis], bfgs.inexact_line_search, False, e)[1]
+    # w_trail = dc.descent(lf, grad_fun, w0[:, np.newaxis], dc.inexact_line_search, False, e)[1]
 
     w_opt = w_trail[-1, :]
     w_opt_mat = w_vec2mat(w_opt)
