@@ -56,16 +56,6 @@ def BFGS(func, gradient, start_point, learn_rate, exact_ls=True, stop_criteria=1
 
     while np.linalg.norm(g) > stop_criteria:
         i += 1
-        # we want to solve Hdk=-g
-        # 1. find L and d such that H+e=Ldiag(d)L' and LDL'dk=-g
-        # 2. solve Ly=-g where y=DL'dk
-        # 3. solve Dz=y where z=L'dk
-        # 4. solve L'dk=z
-        # L, D, e = modifiedChol(np.linalg.inv(B))
-        # D = np.squeeze(D)
-        # y = np.linalg.solve(L, g)  # forward_substitution(L,g)
-        # z = (y / D)
-        # dk = np.linalg.solve(L.T, z)  # backward_substitution(L,g)
         dk = B @ g
         if exact_ls is True:
             a = learn_rate(x, dk)
